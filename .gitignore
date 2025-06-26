@@ -1,0 +1,39 @@
+# Node
+node_modules/
+.env
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Output
+/dist
+/build
+/out
+
+# Music/cover/lyrics cache
+/music/
+*.flac
+*.mp3
+*.lrc
+*.jpg
+*.jpeg
+*.png
+
+# Misc
+*.bak
+*.tmp

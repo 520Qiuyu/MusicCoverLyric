@@ -1,13 +1,13 @@
 {
   "dependencies": {
-    "metaflac-js2": "^1.0.8",
+    "iconv-lite": "^0.6.3",
+    "metaflac-js": "^1.0.5",
     "path": "^0.12.7"
   },
   "name": "musiccoverlyric",
   "version": "1.0.0",
   "description": "用于给音乐批量嵌入封面与歌词",
   "main": "index.js",
-  "devDependencies": {},
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
