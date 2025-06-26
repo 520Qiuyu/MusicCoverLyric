@@ -1,13 +1,6 @@
-const path = require("path");
-const fs = require("fs");
-const iconv = require("iconv-lite");
-
-/** 获取文件路径 */
-function getFilePath(filePath) {
-  console.log("__dirname", __dirname);
-  console.log("__filename", __filename);
-  return path.resolve(__dirname, filePath);
-}
+const path = require('path');
+const fs = require('fs');
+const iconv = require('iconv-lite');
 
 /** 获取文件类型 */
 function getFileType(filePath) {
@@ -15,21 +8,30 @@ function getFileType(filePath) {
   return extname.toLowerCase();
 }
 
-/** 读取文件内容 指定编码 */
 /**
- * 读取文件内容，自动检测编码，优先使用 utf8，失败时尝试 gbk
+ * 读取文件内容（可指定编码）
+ *
+ * 如果未指定编码，默认使用 utf-8 读取。
+ *
  * @param {string} filePath 文件路径
- * @param {string} [encoding] 指定编码，若不传则自动检测
+ * @param {string} [readEncoding='utf-8'] 文件编码，默认 utf-8
  * @returns {string} 文件内容
  * @example
  * readFileContent('test.txt');
  * readFileContent('test.txt', 'gbk');
  */
-function readFileContent(filePath, readEncoding = "utf-8") {
+function readFileContent(filePath, readEncoding = 'utf-8') {
   return iconv.decode(fs.readFileSync(filePath), readEncoding);
 }
 
-/** 获取文件夹下的所有文件 */
+/**
+ * 获取指定文件夹下的所有文件（不递归）
+ *
+ * @param {string} dirPath 文件夹路径
+ * @returns {string[]} 文件（或文件夹）名称数组
+ * @example
+ * getFiles('./data');
+ */
 function getFiles(dirPath) {
   const files = fs.readdirSync(dirPath);
   return files;
@@ -54,7 +56,6 @@ function traverseDir(dirPath, callback) {
 }
 
 module.exports = {
-  getFilePath,
   getFileType,
   traverseDir,
   readFileContent,
