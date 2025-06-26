@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "metaflac-js2": "^1.0.8",
+    "path": "^0.12.7"
+  },
+  "name": "musiccoverlyric",
+  "version": "1.0.0",
+  "description": "用于给音乐批量嵌入封面与歌词",
+  "main": "index.js",
+  "devDependencies": {},
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "flac",
+    "cover",
+    "lyric"
+  ],
+  "author": "qiuyu",
+  "license": "MIT"
+}
