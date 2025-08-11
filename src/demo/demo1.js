@@ -3,7 +3,7 @@ const { traverseDir, getFileType, getFiles } = require("../utils/file");
 const { embedFlacLyric, embedFlacCover } = require("../utils/music");
 
 // 音乐文件夹路径
-const musicPath = path.resolve(__dirname, "D:/Musics/周杰伦/八度空间");
+const musicPath = path.resolve(__dirname, "D:/Documents/react-antd-template/music");
 
 // 封面类型
 const coverTypes = [".png", ".jpeg", ".jpg"];
@@ -19,7 +19,10 @@ traverseDir(musicPath, (filePath, dirPath) => {
     switch (fileType) {
       case ".flac":
         // 嵌入歌词
-        embedFlacLyric(filePath, filePath.replace(".flac", ".lrc"));
+        embedFlacLyric(filePath, filePath.replace(".flac", ".lrc"),{
+          priorityLyric:false,
+          encode: 'utf-8'
+        });
         // 嵌入封面
         const coverPath = coverMap[dirPath];
         if (coverPath) {

@@ -16,6 +16,8 @@ function embedFlacLyric(filePath, lyricPath, options = {}) {
   const {
     /** 优先使用原有歌词 */
     priorityLyric = true,
+    /** encode */
+    encode = 'gbk'
   } = options;
 
   const metaflac = new Metaflac(filePath);
@@ -29,7 +31,7 @@ function embedFlacLyric(filePath, lyricPath, options = {}) {
   }
 
 
-  const lyricContent = readFileContent(lyricPath, "gbk");
+  const lyricContent = readFileContent(lyricPath, encode);
   metaflac.setTag("LYRICS=" + lyricContent);
   metaflac.save();
   return true;
