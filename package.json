@@ -1,9 +1,4 @@
 {
-  "dependencies": {
-    "iconv-lite": "^0.6.3",
-    "metaflac-js": "^1.0.5",
-    "path": "^0.12.7"
-  },
   "name": "musiccoverlyric",
   "version": "1.0.0",
   "description": "用于给音乐批量嵌入封面与歌词",
@@ -18,5 +13,14 @@
     "lyric"
   ],
   "author": "qiuyu",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "iconv-lite": "^0.6.3"
+  },
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.28",
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  }
 }
