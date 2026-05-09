@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import fs from 'fs';
 import ffmpegStatic from 'ffmpeg-static';
 import path from 'path';
 import type { Readable } from 'stream';
@@ -138,13 +139,24 @@ export const runFfmpegFile = (args: string[]): Promise<void> => {
 
   console.log('args', FFMPEG_PATH, ['-y', ...args]?.join('\n'));
 
+  // 确保输出目录存在（约定：args 最后一个元素为输出文件路径）
+  const outputPath = args[args.length - 1];
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+
   return new Promise((resolve, reject) => {
-    const proc = spawn(FFMPEG_PATH, ['-y', ...args], { stdio: ['ignore', 'ignore', 'pipe'] });
+    const proc = spawn(FFMPEG_PATH, ['-y', '-loglevel', 'error', ...args], {
+      stdio: ['ignore', 'ignore', 'pipe'],
+    });
+
+    let stderr = '';
+    proc.stderr?.on('data', (chunk: Buffer) => {
+      stderr += chunk.toString();
+    });
 
     proc.on('error', reject);
     proc.on('close', (code) => {
       if (code !== 0) {
-        reject(new Error(`ffmpeg 进程退出，exit code: ${code}`));
+        reject(new Error(`ffmpeg 进程退出，exit code: ${code}\n${stderr}`));
       } else {
         resolve();
       }
