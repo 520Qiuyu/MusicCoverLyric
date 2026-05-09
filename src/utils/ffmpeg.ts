@@ -43,24 +43,111 @@ export const buildMetadataArgs = (tags: MusicTags): string[] => {
 };
 
 /**
- * 执行 ffmpeg 命令并返回 stdout 的可读流。
- * 若 ffmpeg 进程退出码非 0，流会触发 'error' 事件。
+ * 构建内嵌封面的 ffmpeg 参数列表，output 为输出目标（ 或文件路径）
  */
-export const runFfmpegStream = (args: string[]): Readable => {
+export const buildEmbedCoverArgs = (
+  filePath: string,
+  coverPath: string,
+  output: string
+): string[] => {
+  const format = resolveFormat(filePath);
+  const ext = path.extname(filePath).toLowerCase();
+
+  // MP3 需额外指定 ID3v2 版本以确保封面兼容性
+  const extraArgs = ext === '.mp3' ? ['-id3v2_version', '3'] : [];
+
+  return [
+    '-i',
+    filePath,
+    '-i',
+    coverPath,
+    '-map',
+    '0:a',
+    '-map',
+    '1:v',
+    '-c:a',
+    'copy',
+    '-c:v',
+    'mjpeg',
+    '-disposition:v:0',
+    'attached_pic',
+    ...extraArgs,
+    '-metadata:s:v',
+    'title=Album cover',
+    '-metadata:s:v',
+    'comment=Cover (front)',
+    '-f',
+    format,
+    output,
+  ];
+};
+
+/**
+ * 构建同时内嵌元数据标签和封面的 ffmpeg 参数列表，output 为输出目标（ 或文件路径）
+ */
+export const buildEmbedTagsAndCoverArgs = (
+  filePath: string,
+  tags: MusicTags,
+  coverPath: string,
+  targetPath: string = filePath
+): string[] => {
+  const format = resolveFormat(filePath);
+  const ext = path.extname(filePath).toLowerCase();
+
+  // MP3 需额外指定 ID3v2 版本以确保封面兼容性
+  const extraArgs = ext === '.mp3' ? ['-id3v2_version', '3'] : [];
+
+  return [
+    '-i',
+    filePath,
+    '-i',
+    coverPath,
+    '-map',
+    '0:a',
+    '-map',
+    '1:v',
+    ...buildMetadataArgs(tags),
+    '-c:a',
+    'copy',
+    '-c:v',
+    'mjpeg',
+    '-disposition:v:0',
+    'attached_pic',
+    ...extraArgs,
+    '-metadata:s:v',
+    'title=Album cover',
+    '-metadata:s:v',
+    'comment=Cover (front)',
+    '-f',
+    format,
+    targetPath,
+  ];
+};
+
+/**
+ * 执行 ffmpeg 命令并将输出写入指定文件。
+ * 适用于需要 seek 操作的场景（如 MP3 封面嵌入），避免 pipe 输出不支持 seek 的限制。
+ * args 中最后一个元素应为输出文件路径，函数会自动在最前面插入 `-y` 以覆盖已有文件。
+ *
+ * @example
+ * await runFfmpegFile(['-i', 'input.mp3', '-c', 'copy', '/tmp/output.mp3']);
+ */
+export const runFfmpegFile = (args: string[]): Promise<void> => {
   if (!FFMPEG_PATH)
     throw new Error('未找到 ffmpeg 可执行文件，请安装 ffmpeg-static 或配置系统 ffmpeg');
 
-  const proc = spawn(FFMPEG_PATH, args, { stdio: ['ignore', 'pipe', 'pipe'] });
+  console.log('args', FFMPEG_PATH, ['-y', ...args]?.join('\n'));
 
-  proc.on('error', (err) => {
-    (proc.stdout as Readable).destroy(err);
+  return new Promise((resolve, reject) => {
+    const proc = spawn(FFMPEG_PATH, ['-y', ...args], { stdio: ['ignore', 'ignore', 'pipe'] });
+
+    proc.on('error', reject);
+    proc.on('close', (code) => {
+      if (code !== 0) {
+        reject(new Error(`ffmpeg 进程退出，exit code: ${code}`));
+      } else {
+        resolve();
+      }
+    });
   });
-
-  proc.on('close', (code) => {
-    if (code !== 0) {
-      (proc.stdout as Readable).destroy(new Error(`ffmpeg 进程退出，exit code: ${code}`));
-    }
-  });
-
-  return proc.stdout as Readable;
 };

@@ -50,45 +50,55 @@ export function traverseDir(
 }
 
 /**
- * 将可读流写入临时文件后替换目标文件，实现原子写入语义。
- * 操作失败时会自动清理临时文件。
+ * 在目标目录创建临时文件，执行操作成功后原子性重命名为目标文件。
+ * 操作失败时自动清理临时文件。
  *
  * 实现要点：
  * - 临时文件放在目标目录下，避免跨盘符 rename 失败（Windows 下 fs.rename 不支持跨设备）
  * - 自动创建目标目录，避免目录不存在导致的 ENOENT
+ *
+ * @example
+ * await withTempFile('./output.mp3', async (tmpPath) => {
+ *   await runFfmpegFile(['-i', 'input.mp3', tmpPath]);
+ * });
  */
-export const streamToFileInPlace = (stream: Readable, targetPath: string): Promise<void> => {
+export const withTempFile = async (
+  targetPath: string,
+  action: (tmpPath: string) => Promise<void>
+): Promise<void> => {
   const targetDir = path.dirname(targetPath);
   fs.mkdirSync(targetDir, { recursive: true });
-
   const tmpPath = path.join(targetDir, `.mcl_${Date.now()}_${path.basename(targetPath)}.tmp`);
-
-  return new Promise((resolve, reject) => {
-    const writer = fs.createWriteStream(tmpPath);
-
-    stream.pipe(writer);
-
-    writer.on('finish', () => {
-      fs.rename(tmpPath, targetPath, (err) => {
-        if (err) {
-          console.log('err',err)
-          fs.unlink(tmpPath, () => {});
-          return reject(err);
-        }
-        resolve();
-      });
-    });
-
-    writer.on('error', (err) => {
-      console.log('err',err)
-      fs.unlink(tmpPath, () => {});
-      reject(err);
-    });
-
-    stream.on('error', (err) => {
-      console.log('err',err)
-      fs.unlink(tmpPath, () => {});
-      reject(err);
-    });
-  });
+  try {
+    await action(tmpPath);
+    await fs.promises.rename(tmpPath, targetPath);
+  } catch (err) {
+    fs.unlink(tmpPath, () => {});
+    throw err;
+  }
 };
+
+/**
+ * 将可读流写入临时文件后替换目标文件，实现原子写入语义。
+ * 操作失败时会自动清理临时文件。
+ *
+ * @example
+ * const stream = embedTags('./music.mp3', { title: '歌曲名' });
+ * await streamToFileInPlace(stream, './output.mp3');
+ */
+export const streamToFileInPlace = (stream: Readable, targetPath: string): Promise<void> =>
+  withTempFile(targetPath, (tmpPath) =>
+    new Promise<void>((resolve, reject) => {
+      const writer = fs.createWriteStream(tmpPath);
+      stream.pipe(writer);
+      writer.on('finish', resolve);
+      writer.on('error', (err) => {
+        console.log('err', err);
+        reject(err);
+      });
+      stream.on('error', (err) => {
+        console.log('err', err);
+        reject(err);
+      });
+    })
+  );
