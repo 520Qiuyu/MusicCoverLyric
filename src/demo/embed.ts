@@ -49,3 +49,44 @@ const runEmbedTagsAndCover = async () => {
 // runEmbedTags();
 // runEmbedCover();
 runEmbedTagsAndCover();
+
+// 测试本地替换
+const MP3_LOCAL_PATH = path.resolve(__dirname, '../../music/inPlace/mp3/在我心里从此有个你.mp3');
+const FLAC_LOCAL_PATH = path.resolve(__dirname, '../../music/inPlace/flac/暗号.flac');
+
+const runEmbedTagsInPlace = async () => {
+  await embedTags(
+    MP3_LOCAL_PATH,
+    { title: 'test', artist: 'qiuyu', lyrics: readFileContent(MP3_LYRIC_PATH) },
+    MP3_LOCAL_PATH
+  );
+  await embedTags(
+    FLAC_LOCAL_PATH,
+    { title: 'test', artist: 'qiuyu', lyrics: readFileContent(FLAC_LYRIC_PATH) },
+    FLAC_LOCAL_PATH
+  );
+};
+
+const runEmbedCoverInPlace = async () => {
+  await embedCover(MP3_LOCAL_PATH, MP3_COVER_PATH, MP3_LOCAL_PATH);
+  await embedCover(FLAC_LOCAL_PATH, FLAC_COVER_PATH, FLAC_LOCAL_PATH);
+};
+
+const runEmbedTagsAndCoverInPlace = async () => {
+  await embedTagsAndCover(
+    MP3_LOCAL_PATH,
+    { title: 'test', artist: 'qiuyu', lyrics: readFileContent(MP3_LYRIC_PATH) },
+    MP3_COVER_PATH,
+    MP3_LOCAL_PATH
+  );
+  await embedTagsAndCover(
+    FLAC_LOCAL_PATH,
+    { title: 'test', artist: 'qiuyu', lyrics: readFileContent(FLAC_LYRIC_PATH) },
+    FLAC_COVER_PATH,
+    FLAC_LOCAL_PATH
+  );
+};
+
+// runEmbedTagsInPlace();
+// runEmbedCoverInPlace();
+runEmbedTagsAndCoverInPlace();
