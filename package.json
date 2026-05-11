@@ -1,6 +1,6 @@
 {
   "name": "musiccoverlyric",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "用于给音乐批量嵌入封面与歌词",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
