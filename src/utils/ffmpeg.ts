@@ -1,8 +1,7 @@
 import { spawn } from 'child_process';
-import fs from 'fs';
 import ffmpegStatic from 'ffmpeg-static';
+import fs from 'fs';
 import path from 'path';
-import type { Readable } from 'stream';
 import type { MusicTags } from '../types';
 
 export const FFMPEG_PATH = ffmpegStatic as string;
@@ -39,6 +38,9 @@ export const buildMetadataArgs = (tags: MusicTags): string[] => {
   return Object.entries(tags).flatMap(([key, value]) => {
     if (value === undefined) return [];
     const ffmpegKey = KEY_MAP[key] ?? key;
+    if (ffmpegKey === 'lyrics') {
+      return ['-metadata', `${ffmpegKey}=${value}`, '-metadata', `UNSYNCED LYRICS=${value}`];
+    }
     return ['-metadata', `${ffmpegKey}=${value}`];
   });
 };
