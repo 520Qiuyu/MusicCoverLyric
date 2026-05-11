@@ -26,13 +26,13 @@ Desktop.ini
 /out
 
 # Music/cover/lyrics cache
-/music/
-*.flac
-*.mp3
-*.lrc
-*.jpg
-*.jpeg
-*.png
+# /music/
+# *.flac
+# *.mp3
+# *.lrc
+# *.jpg
+# *.jpeg
+# *.png
 
 # Misc
 *.bak
