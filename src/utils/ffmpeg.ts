@@ -4,12 +4,23 @@ import fs from 'fs';
 import path from 'path';
 import type { MusicTags } from '../types';
 
+// 轻量颜色工具，仅在开发调试时使用（生产构建会被 strip）
+const pc = {
+  cyan: (s: string) => `\x1b[36m${s}\x1b[0m`,
+  dim: (s: string) => `\x1b[2m${s}\x1b[0m`,
+};
+
 export const FFMPEG_PATH = ffmpegStatic as string;
 
 /** 支持的文件扩展名 → ffmpeg 格式名映射 */
 export const FORMAT_MAP: Record<string, string> = {
   '.mp3': 'mp3',
   '.flac': 'flac',
+  '.ogg': 'ogg',
+  '.oga': 'ogg',
+  '.opus': 'opus',
+  '.m4a': 'mp4',
+  '.mp4': 'mp4',
 };
 
 /**
@@ -18,7 +29,7 @@ export const FORMAT_MAP: Record<string, string> = {
 export const resolveFormat = (filePath: string): string => {
   const ext = path.extname(filePath).toLowerCase();
   const format = FORMAT_MAP[ext];
-  if (!format) throw new Error(`不支持的音频格式: ${ext}，仅支持 mp3 / flac`);
+  if (!format) throw new Error(`不支持的音频格式: ${ext}，仅支持 mp3 / flac / ogg / opus / m4a`);
   return format;
 };
 
@@ -139,7 +150,10 @@ export const runFfmpegFile = (args: string[]): Promise<void> => {
   if (!FFMPEG_PATH)
     throw new Error('未找到 ffmpeg 可执行文件，请安装 ffmpeg-static 或配置系统 ffmpeg');
 
-  console.log('args', FFMPEG_PATH, ['-y', ...args]?.join('\n'));
+  console.log(pc.cyan('\n━━━ ffmpeg command ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'));
+  console.log(`  ${pc.dim('ffmpeg')}  ${FFMPEG_PATH}`);
+  console.log(`  ${pc.dim('args')}\n${['-y', ...args].join('\n')}\n`);
+  console.log(pc.cyan('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'));
 
   // 确保输出目录存在（约定：args 最后一个元素为输出文件路径）
   const outputPath = args[args.length - 1];

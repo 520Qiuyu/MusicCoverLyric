@@ -34,6 +34,12 @@ Desktop.ini
 # *.jpeg
 # *.png
 
+# Test artifacts
+tests/__temp__/
+
+# Claude Code
+.claude/
+
 # Misc
 *.bak
 *.tmp

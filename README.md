@@ -1,12 +1,12 @@
 # musiccoverlyric
 
-面向 **Node.js** 的小型工具库，用于在 **MP3 / FLAC** 文件中嵌入 **元数据标签**、**封面图片** 与 **歌词文本**（LRC 等纯文本内容）。底层通过 **ffmpeg** 处理媒体，依赖包内自带的 **ffmpeg-static** 可执行文件，无需在系统 PATH 中单独安装 ffmpeg。
+面向 **Node.js** 的小型工具库，用于在 **MP3 / FLAC / OGG / Opus / M4A** 文件中嵌入 **元数据标签**、**封面图片** 与 **歌词文本**（LRC 等纯文本内容）。底层通过 **ffmpeg** 处理媒体，依赖包内自带的 **ffmpeg-static** 可执行文件，无需在系统 PATH 中单独安装 ffmpeg。
 
 ---
 
 ## 特性
 
-- **格式**：`.mp3`、`.flac`（其它扩展名会在解析阶段抛出明确错误）。
+- **格式**：`.mp3`、`.flac`、`.ogg`、`.opus`、`.m4a`（`.mp4`）。其中 `.ogg` / `.opus` 仅支持元数据写入，不支持封面嵌入（容器限制）。
 - **标签**：标题、艺人、专辑、年份、流派、歌词、音轨号、注释及自定义键值；歌词字段会同时写入 `lyrics` 与 `UNSYNCED LYRICS`，以兼顾常见播放器对 USLT 的识别。
 - **封面**：支持常见图片输入（如 JPEG、PNG）；MP3 使用 ID3v2.3 与 `attached_pic` 语义，输出写入**可 seek 的文件路径**（避免仅 stdout 管道时封面丢失的问题）。
 - **类型**：提供 TypeScript 声明，便于在 TS 项目中获得完整类型提示。
@@ -116,7 +116,7 @@ const { embedTags } = require('musiccoverlyric');
 
 | 参数 | 说明 |
 |------|------|
-| `filePath` | 输入音频路径（`.mp3` / `.flac`）。 |
+| `filePath` | 输入音频路径（`.mp3` / `.flac` / `.ogg` / `.opus` / `.m4a`）。 |
 | `tags` | 元数据对象，见下方 `MusicTags`。 |
 | `targetPath` | 输出文件路径；**默认等于 `filePath`**（覆盖原文件）。 |
 

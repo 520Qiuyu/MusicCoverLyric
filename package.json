@@ -18,9 +18,12 @@
   "type": "commonjs",
   "scripts": {
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
-    "build": "npm run clean && tsc",
+    "build": "tsup && tsc --emitDeclarationOnly --outDir dist",
+    "build:dev": "tsup --watch",
     "prepublishOnly": "npm run build",
-    "test": "ts-node src/demo/embed.ts"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:demo": "ts-node src/demo/embed.ts"
   },
   "keywords": [
     "flac",
@@ -37,6 +40,9 @@
     "@types/fluent-ffmpeg": "^2.1.28",
     "@types/node": "^25.6.0",
     "dts-bundle-generator": "^9.5.1",
-    "typescript": "^6.0.3"
+    "music-metadata": "^11.12.3",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
   }
 }

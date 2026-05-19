@@ -92,13 +92,7 @@ export const streamToFileInPlace = (stream: Readable, targetPath: string): Promi
       const writer = fs.createWriteStream(tmpPath);
       stream.pipe(writer);
       writer.on('finish', resolve);
-      writer.on('error', (err) => {
-        console.log('err', err);
-        reject(err);
-      });
-      stream.on('error', (err) => {
-        console.log('err', err);
-        reject(err);
-      });
+      writer.on('error', reject);
+      stream.on('error', reject);
     })
   );
